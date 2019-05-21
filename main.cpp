@@ -9,19 +9,20 @@ extern "C"
     void drawPolynomialAsm(float imgWidth, float imgHeight, float a, float b, float c, float d, float S, unsigned int *pixels);
 }
 
-void drawPolynomial(float imgWidth, float imgHeight, float a, float b, float c, float d, float S, Uint32 *pixels)
+void drawPolynomial(float imgWidth, float imgHeight, float a, float b, float c, float d, float S, unsigned int *pixels)
 {
     //for(int x=0;x<imgWidth;x++)
-    float x = 0;
-    float y = x * x * x * a + x * x * b + x * c + d;
+//    float x = 0;
+  //  float y = x * x * x * a + x * x * b + x * c + d;
     //float dx = sqrt(S-dy*dy);
-    float dx = sqrt(S / ((3 * x * x * a + 2 * x * b + c) * (3 * x * x * a + 2 * x * b + c) + 1));
+   // float dx = sqrt((S*S) / ((3 * x * x * a + 2 * x * b + c) * (3 * x * x * a + 2 * x * b + c) + 1));
     //S= dx2+dy2
     //S= dx2 +dx2*(6*x+2*b)
     //float dx2=S/(6*x+2*b+1);
     //y=x^3
 
-    float dy = (3 * x * x * a + 2 * x * b + c) * dx;
+    //float dy = (3 * x * x * a + 2 * x * b + c) * dx;
+    float dy,dx,x,y;
     //float dx=sqrt(S);
     //float dy2 = 6 *x +2*b *dx2;
     //float dx=sqrt(dx2);
@@ -33,28 +34,30 @@ void drawPolynomial(float imgWidth, float imgHeight, float a, float b, float c, 
     //float x2;
     //float y2;
     //draw  first point
+    x=0;
+    y=d;
+int i = (x*imgWidth)/100;
+    int j = (y*imgHeight)/100;
+    
 
-    int j = y / dx;
-    int i = 0;
-
-    int index = ((imgHeight - j) * imgWidth) - 1;
-
+    int index  = ((imgHeight - j)*imgHeight + i )- imgWidth ;
+    //int index=0;
+    //int index =1000000;
     //	while (index<1000000)
-    for (x = 0; i < 1000 && j < 1000; x += dx)
+   // pixels[1020000]=0;
+   //x+=dx;
+   
+    for (x=0; i < 1000 && j < 1000; x +=0)
     {
 
         // index =y*1000 - x;
         //i++;
-
-        //if(i<0)
-        {
-            std::cout << "index " << index << std::endl;
-            std::cout << "x=" << x << " y=" << y << " i=" << i << " j=" << j << " dx=" << dx << " dy=" << dy << std::endl;
-        }
+//y = x * x * x * a + x * x * b + x * c + d;
+       
         //if(x > imgWidth && y >imgHeight)break;
 
         //pixels[index] = 0xFF000000;
-        pixels[index] = 0;
+        
 
         //x+=dx;
         //y+=dy;
@@ -67,48 +70,35 @@ void drawPolynomial(float imgWidth, float imgHeight, float a, float b, float c, 
         //y = y + dy;
         // x+=0.1;
 
-        i = x / dx;
-        j = y / dx;
-        index = (imgHeight - j) * imgWidth - (imgWidth - i) - 1;
-        dx = sqrt(S / ((3 * x * x * a + 2 * x * b + c) * (3 * x * x * a + 2 * x * b + c) + 1));
+        //i = x / 1000;
+        //j = y / 1000;
+       
+       // index = (imgHeight*j)+i;
+        dx = sqrt((S*S) / ((3 * x * x * a + 2 * x * b + c) * (3 * x * x * a + 2 * x * b + c) + 1));
 
-        //y = x * x * x * a + x * x * b + x * c + d;
-        y += dy;
+        
         dy = (3 * x * x * a + 2 * x * b + c) * dx;
+        
+         i=x*imgWidth/100;
+        j=y*imgHeight/100;
+        index = index  = (imgHeight - j)*imgHeight + i - imgWidth ;
+        x+=dx;
+        y += dy;
+        if(index>(imgHeight*imgWidth) ||i>1000||j>1000)return;
+
+        pixels[index] = 0;
+         if(i<300)
+        {
+            std::cout << "index " << index << std::endl;
+            std::cout << "x=" << x << " y=" << y << " i=" << i << " j=" << j << " dx=" << dx << " dy=" << dy <<" dx^2+dy^2="<<dy*dy+dx*dx<<"?="<<S*S<< std::endl;
+        }
         //dx=sqrt(S/((3*x*x*a+2*x*b+c)*(3*x*x*a+2*x*b+c)+1));
         //dy = (3*x*x*a+2*x*b+c)*dx;
         //SDL_RenderDrawLine(oldx,oldy,x,y)
     }
     std::cout << "end\n";
 }
-int getNumber(SDL_Event event)
-{
-    switch (event.key.keysym.sym)
-    {
-    case SDLK_0:
-        return 0;
-    case SDLK_1:
-        return 1;
-    case SDLK_2:
-        return 2;
-    case SDLK_3:
-        return 3;
-    case SDLK_4:
-        return 4;
-    case SDLK_5:
-        return 5;
-    case SDLK_6:
-        return 6;
-    case SDLK_7:
-        return 7;
-    case SDLK_8:
-        return 8;
-    case SDLK_9:
-        return 9;
-    default:
-        return -1;
-    }
-}
+
 
 int main(int argc, char **argv)
 {
@@ -118,7 +108,7 @@ int main(int argc, char **argv)
         std::cout << "Please give function parametrs (ax^3+bx^2+cx+d) and the jump value(dx^2+dy^2=S)" << argv[0] << " <a> <b> <c> <d> <S>\n";
         return 1;
     }
-    int imageWidth = 1000, imageHeight = 1000;
+    unsigned int imageWidth = 1000, imageHeight = 1000;
 
     //imageWidth = atoi(argv[1]);
     //imageHeight = atoi(argv[2]);
@@ -136,13 +126,17 @@ int main(int argc, char **argv)
     SDL_Window *window = SDL_CreateWindow("SDL2 polynomial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, imageWidth, imageHeight, 0);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, imageWidth, imageHeight);
+    
+    
+    unsigned int *pixels = new unsigned int[imageWidth*imageHeight];
+   
+    
+    //srand(time(NULL));
+    memset(pixels, 255, imageWidth * imageHeight * sizeof(unsigned int)); //set pixel array to white
 
-    Uint32 *pixels = new Uint32[imageWidth * imageHeight];
-    srand(time(NULL));
-    memset(pixels, 255, imageWidth * imageHeight * sizeof(Uint32)); //set pixel array to white
-
-    //drawPolynomial(imageWidth,imageHeight,a, b, c, d, S,pixels);
+//    drawPolynomial(imageWidth,imageHeight,a, b, c, d, S,pixels);
     drawPolynomialAsm(imageWidth, imageHeight, a, b, c, d, S, pixels);
+    
     SDL_StartTextInput();
     char *text;
     
